@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../repositories/time_repository.dart';
 
 /// Rxパターンを実装した時間の Observable クラス
 ///
@@ -10,6 +11,7 @@ class TimeObservable {
   // broadcast()を使用することで、複数のリスナーがストリームを購読可能
   final StreamController<DateTime> _timeController =
       StreamController<DateTime>.broadcast();
+  final TimeRepository _timeRepository;
   Timer? _timer;
   DateTime? _latestValue;
 
@@ -17,21 +19,25 @@ class TimeObservable {
   /// broadcast ストリームなので、複数の Widget で同時に購読可能
   Stream<DateTime> get timeStream => _timeController.stream;
 
-  /// デフォルトコンストラクタ
-  /// - [_latestValue] を現在の日時に初期化
-  /// - [_timeController] に現在の日時を発行
-  /// - [_startTimer] を呼び出して 1秒ごとに新しい時間を発行
-  TimeObservable() {
-    _latestValue = DateTime.now();
-    _timeController.add(_latestValue!);
+  /// コンストラクタ
+  /// [timeRepository] 時間を取得するためのリポジトリ
+  /// 
+  /// 依存性注入により、テスト時にモックリポジトリを注入可能
+  TimeObservable(this._timeRepository) {
+    _updateAndEmitTime();
     _startTimer();
+  }
+
+  /// 時間を更新してストリームに発行
+  void _updateAndEmitTime() {
+    _latestValue = _timeRepository.getCurrentTime();
+    _timeController.add(_latestValue!);
   }
 
   /// 1秒ごとに新しい時間を発行するタイマーを開始
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _latestValue = DateTime.now();
-      _timeController.add(_latestValue!);
+      _updateAndEmitTime();
     });
   }
 

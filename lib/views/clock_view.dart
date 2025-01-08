@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/clock_view_model.dart';
+import '../repositories/time_repository.dart';
 
 /// デジタル時計の View クラス
 /// 
@@ -8,7 +9,9 @@ import '../viewmodels/clock_view_model.dart';
 /// - [ClockViewModel] からの時刻データを購読
 /// - setState を使用せずに UI を更新
 class ClockView extends StatefulWidget {
-  const ClockView({super.key});
+  final TimeRepository? timeRepository;
+
+  const ClockView({super.key, this.timeRepository});
 
   @override
   State<ClockView> createState() => _ClockViewState();
@@ -19,7 +22,15 @@ class ClockView extends StatefulWidget {
 /// [ClockViewModel] のライフサイクルを管理し、
 /// [StreamBuilder] を使用して時刻の表示を行います
 class _ClockViewState extends State<ClockView> {
-  final ClockViewModel _viewModel = ClockViewModel();
+  late final ClockViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = ClockViewModel(
+      timeRepository: widget.timeRepository ?? SystemTimeRepository(),
+    );
+  }
 
   @override
   void dispose() {

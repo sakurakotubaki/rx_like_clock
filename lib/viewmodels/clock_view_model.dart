@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../models/time_observable.dart';
+import '../repositories/time_repository.dart';
 
 /// 時計の ViewModel クラス
 /// 
@@ -8,8 +9,13 @@ import '../models/time_observable.dart';
 /// - 時間データの文字列フォーマットへの変換
 /// - View層への加工済みデータの提供
 class ClockViewModel {
-  final TimeObservable _timeObservable = TimeObservable();
+  final TimeObservable _timeObservable;
   
+  /// コンストラクタ
+  /// [timeRepository] 時間を取得するためのリポジトリ
+  ClockViewModel({required TimeRepository timeRepository}) 
+      : _timeObservable = TimeObservable(timeRepository);
+
   /// 時刻を "HH:mm:ss" 形式の文字列として提供する Stream
   /// 
   /// Stream<DateTime> を Stream<String> に変換（map）することで、
