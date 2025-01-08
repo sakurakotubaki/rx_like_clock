@@ -1,5 +1,5 @@
 /// 時間データの取得を抽象化するインターフェース
-abstract class TimeRepository {
+abstract interface class TimeRepository {
   /// 現在時刻を取得
   DateTime getCurrentTime();
 }
